@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\Guest\DashboardController as GuestDashboardController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,19 +14,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// # Rotte pubbliche
-Route::get('/', [GuestDashboardController::class, 'index'])
-  ->name('home');
+Route::get('/', function () {
+    return view('welcome');
+});
 
-// # Rotte protette
-Route::middleware('auth')
-  ->prefix('/admin')
-  ->name('admin.')
-  ->group(function () {
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-      ->name('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
-  });
-
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
